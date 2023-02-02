@@ -2,6 +2,7 @@ import schedule from 'node-schedule'
 import dayjs from 'dayjs'
 
 import { prisma } from '../../lib/prisma'
+import { resetTimestamp } from '../../utils/resetTimestamp'
 import NewsletterMail from '../NewsletterMail'
 
 class SendNewsletter {
@@ -19,20 +20,25 @@ class SendNewsletter {
 
     async handle() {
 
-        const yesterday = dayjs().add(0, 'day').startOf('day').toDate()
+        const yesterday = resetTimestamp(dayjs().add(-1, 'day'))
+        const today = resetTimestamp()
 
         const [lastMessage] = await prisma.message.findMany({
             where: {
                 createdAt: {
-                    lte: yesterday
+                    equals: yesterday
+                },
+                invitedAt: {
+                    equals: null
                 }
             },
             include: {
-                contactMessages: true
+                contactMessages: {
+                    select: {
+                        contact_id: true
+                    }
+                }
             },
-            orderBy: {
-                createdAt: 'desc'
-            }
         })
 
         // Verificar se é uma mensagem agendada
@@ -45,15 +51,29 @@ class SendNewsletter {
                 where: {
                     id: {
                         in: lastMessage.contactMessages.map(cm => cm.contact_id)
+                    },
+                    active: {
+                        equals: true
                     }
                 }
             })
-    
+
             await Promise.all(
                 contacts.map((contact) => {
                     return NewsletterMail.handle({ message: lastMessage, contact })
                 })
             )
+
+            // Update invited_at
+
+            await prisma.message.update({
+                where: {
+                    id: lastMessage.id
+                },
+                data: {
+                    invitedAt: today
+                }
+            })
         }
 
     }
