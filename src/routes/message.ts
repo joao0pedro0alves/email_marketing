@@ -1,8 +1,9 @@
 import { FastifyInstance } from "fastify"
 import * as z from 'zod'
-import NewsletterMail from "../jobs/NewsletterMail"
 
+import NewsletterMail from "../jobs/NewsletterMail"
 import { prisma } from "../lib/prisma"
+import { removeTimestamp } from "../utils/removeTimestamp"
 
 export async function messageRoutes(fastify: FastifyInstance) {
     fastify.post('/messages', async (request, reply) => {
@@ -14,8 +15,11 @@ export async function messageRoutes(fastify: FastifyInstance) {
 
         const { title, content, contacts: contactIds } = createMessageBody.parse(request.body)
 
+        const today = removeTimestamp()
+
         const newMessage = await prisma.message.create({
             data: {
+                createdAt: today,
                 content,
                 title,
                 contactMessages: {

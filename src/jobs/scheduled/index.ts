@@ -1,6 +1,6 @@
 import schedule from 'node-schedule'
 import SendNewsletter from "./SendNewsletter"
 
-export function initializeJobs() {
+export async function initializeJobs() {
     schedule.scheduleJob(SendNewsletter.rule, SendNewsletter.handle)
 }
