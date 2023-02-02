@@ -16,7 +16,7 @@ model Message {
   content   String
   createdAt DateTime @default(now())
 
-  ContactMessage ContactMessage[]
+  contactMessages ContactMessage[]
 
   @@map("messages")
 }
@@ -26,7 +26,7 @@ model Contact {
   name  String
   email String @unique
 
-  ContactMessage ContactMessage[]
+  contactMessages ContactMessage[]
 
   @@map("contacts")
 }

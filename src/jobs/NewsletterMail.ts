@@ -1,10 +1,13 @@
 import path from 'path'
 import fs from 'fs'
 import handlebars from 'handlebars'
+import Mail from 'nodemailer/lib/mailer'
+import { Message } from '@prisma/client'
 
 import { transporter } from '../lib/mailer'
 
-interface NewsletterMailParams {
+interface NewsletterMailParams extends Mail.Options {
+    message: Message,
     contact: {
         name: string
         email: string
@@ -14,13 +17,17 @@ interface NewsletterMailParams {
 class NewsletterMail {
     key = 'NewsletterMail'
 
-    async handle({ contact }: NewsletterMailParams) {
+    async handle({ message, contact, ...options }: NewsletterMailParams) {
+        console.log('Sending email...')
+
         const filePath = path.join(__dirname, '../emails/template.html')
         const source = fs.readFileSync(filePath, 'utf-8').toString()
         const template = handlebars.compile(source)
 
         const replacements = {
-            username: contact.name,
+            name: contact.name,
+            title: message.title,
+            content: message.content,
         }
 
         const htmlToSend = template(replacements)
@@ -28,8 +35,9 @@ class NewsletterMail {
         transporter.sendMail({
             from: process.env.MAIL_SENDER,
             to: contact.email,
-            subject: `Hello ${contact.name}, how you do?`,
+            subject: message.title,
             html: htmlToSend,
+            ...options
         })
     }
 }
