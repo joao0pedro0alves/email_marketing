@@ -11,10 +11,11 @@ datasource db {
 }
 
 model Message {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   title     String
   content   String
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+  invitedAt DateTime?
 
   contactMessages ContactMessage[]
 
@@ -22,9 +23,10 @@ model Message {
 }
 
 model Contact {
-  id    String @id @default(cuid())
-  name  String
-  email String @unique
+  id     String  @id @default(cuid())
+  name   String
+  email  String  @unique
+  active Boolean @default(true)
 
   contactMessages ContactMessage[]
 
