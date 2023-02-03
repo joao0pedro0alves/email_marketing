@@ -10,10 +10,11 @@ export async function messageRoutes(fastify: FastifyInstance) {
         const createMessageBody = z.object({
             title: z.string(),
             content: z.string(),
-            contacts: z.array(z.string())
+            contacts: z.array(z.string().cuid()).min(1),
+            inviteNow: z.boolean()
         })
 
-        const { title, content, contacts: contactIds } = createMessageBody.parse(request.body)
+        const { title, content, contacts: contactIds, inviteNow } = createMessageBody.parse(request.body)
 
         const today = resetTimestamp()
 
@@ -38,15 +39,27 @@ export async function messageRoutes(fastify: FastifyInstance) {
             }
         })
         
-        await Promise.all(
-            contacts.map((contact) => {
-                NewsletterMail.handle({
-                    message: newMessage,
-                    contact,
+        if (inviteNow) {
+            await Promise.all(
+                contacts.map((contact) => {
+                    NewsletterMail.handle({
+                        message: newMessage,
+                        contact,
+                    })
                 })
-            })
-        )
+            )
 
-        return reply.send().status(200)
+            // Update invited_at
+            await prisma.message.update({
+                where: {
+                    id: newMessage.id
+                },
+                data: {
+                    invitedAt: today
+                }
+            })
+        }
+
+        return reply.send().status(201)
     })
 }
