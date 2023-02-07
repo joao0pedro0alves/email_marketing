@@ -1,34 +1,15 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { Header } from './app/components/Header'
+import { MessagesList } from './app/features/MessagesList'
 
-function App() {
-  const [count, setCount] = useState(0)
+import './lib/dayjs'
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+export function App() {
+    return (
+        <div className="w-screen h-screen flex items-center justify-center">
+            <div className="bg-gray-800/80 border border-gray-700/50 shadow-lg rounded-lg w-full max-w-4xl flex flex-col gap-2 overflow-hidden">
+                <Header />
+                <MessagesList />
+            </div>
+        </div>
+    )
 }
-
-export default App
