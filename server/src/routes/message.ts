@@ -18,23 +18,29 @@ export async function messageRoutes(fastify: FastifyInstance) {
 
         const today = resetTimestamp()
 
+        const contacts = await prisma.contact.findMany({
+            where: {
+                id: {
+                    in: contactIds
+                }
+            }
+        })
+
+        if (contacts.length === 0) {
+            return reply.status(400).send({
+                message: 'Contatos não cadastrados.',
+            })
+        }
+
         const newMessage = await prisma.message.create({
             data: {
                 createdAt: today,
                 content,
                 title,
                 contactMessages: {
-                    create: contactIds.map(contactId => ({
-                        contact_id: contactId
+                    create: contacts.map((contact) => ({
+                        contact_id: contact.id
                     }))
-                }
-            }
-        })
-
-        const contacts = await prisma.contact.findMany({
-            where: {
-                id: {
-                    in: contactIds
                 }
             }
         })

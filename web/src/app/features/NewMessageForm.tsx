@@ -5,7 +5,6 @@ import { TextField } from '../components/TextField'
 import { TextArea } from '../components/TextArea'
 import { Checkbox } from '../components/Checkbox'
 import { Label } from '../components/Label'
-import { ContactsList } from './ContactsList'
 
 export function NewMessageForm() {
     function createNewMessage(event: FormEvent) {
@@ -40,8 +39,6 @@ export function NewMessageForm() {
                 <Label htmlFor=''>
                     Enviar para:
                 </Label>
-
-                <ContactsList />
             </div>
 
             <button

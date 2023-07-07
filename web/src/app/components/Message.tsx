@@ -44,7 +44,7 @@ export function Message({ data }: MessageProps) {
                 </div>
             </div>
 
-            <p className="text-sm text-gray-400 group-hover:text-lg transition-all">
+            <p className="text-sm text-gray-400">
                 {data.content}
             </p>
         </li>
